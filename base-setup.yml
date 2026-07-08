@@ -1,0 +1,70 @@
+---
+- name: Configure Base OS for all Lab Nodes
+  hosts: lab
+  become: yes # This tells Ansible to use sudo
+  tasks:
+    - name: Install EPEL Release and Core Tools
+      ansible.builtin.dnf:
+        name: 
+          - epel-release
+          - git
+          - curl
+          - tar
+          - vim
+          - python3-libselinux # Required for Ansible to manage SELinux
+        state: present
+
+    - name: Ensure all packages are up to date
+      ansible.builtin.dnf:
+        name: "*"
+        state: latest
+
+    - name: Ensure Firewalld is installed and running
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+- name: Install Docker & Tools on Ops Node
+  hosts: ops
+  become: yes
+  tasks:
+    - name: Add Docker CE repository
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker and Compose Plugin
+      ansible.builtin.dnf:
+        name: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Ensure Docker is started and enabled
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add devops user to docker group
+      ansible.builtin.user:
+        name: devops
+        groups: docker
+        append: yes
+
+    - name: Install EPEL Release and Core Tools
+      ansible.builtin.dnf:
+        name: 
+          - epel-release
+          - git
+          - curl
+          - tar
+          - vim
+          - python3-libselinux # Required for Ansible to manage SELinux
+          - firewalld
+        state: present
+
+    - name: Ensure all packages are up to date

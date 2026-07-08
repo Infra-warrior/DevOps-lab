@@ -95,8 +95,8 @@ resource "libvirt_domain" "lab_nodes" {
 }
 
 # 7. Output the dynamically assigned IPs
-output "node_ips" {
-  value = {
-    for key, node in libvirt_domain.lab_nodes : key => node.network_interface[0].addresses[0]
-  }
-}
+#output "node_ips" {
+#  value = {
+#    for key, node in libvirt_domain.lab_nodes : key => node.network_interface[0].addresses[0]
+#  }
+#}
